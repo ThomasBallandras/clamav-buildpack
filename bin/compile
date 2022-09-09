@@ -21,7 +21,7 @@ touch "${build}/config/clamav/clamd.sock"
 # Check for updates in the antivirus database
 # Use the cache directory so that if the database hasn't changed, we can simply use the artifact from the previous deploy
 mkdir -p "${cache}/clamav-data"
-freshclam --config-file="${build}/config/clamav/freshclam.conf" --datadir="${cache}/clamav-data/" --log=/dev/stdout --quiet
+freshclam --config-file="${build}/config/clamav/freshclam.conf" --datadir="${cache}/clamav-data/"
 
 # Replace the current virus database with the new one:
 rm -rf "${build}/.clamav-data"
