@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo "Enabling clamav"
+echo "Enabling ClamAV"
 exit 0

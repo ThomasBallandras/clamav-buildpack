@@ -1,10 +1,28 @@
 #!/usr/bin/env bash
 # bin/compile build_path cache_path
-build="$1"
-cache="$2"
-set -e
+#
+# See https://blog.heroku.com/hacking-buildpacks#compile for good documentation
+#
+# build - gives you a handle for the root directory of the app
+# cache - gives you a location to persist build artifacts between deployments
+#
+build="$1" # something like /tmp/build_<uuid>
+cache="$2" # /app/tmp/cache
+
+set -e # Raise errors if anything goes wrong
+
+# Create the config file for the daemon:
+touch "${build}/config/clamav/clamd.conf"
+echo "LocalSocket /app/config/clamav/clamd.sock" > "${build}/config/clamav/clamd.conf"
+
+# Create the socket file for the daemon:
+touch "${build}/config/clamav/clamd.sock"
+
+# Check for updates in the antivirus database
+# Use the cache directory so that if the database hasn't changed, we can simply use the artifact from the previous deploy
 mkdir -p "${cache}/clamav-data"
-# Override the specified datadir so we retain changes via the cache.
-freshclam --config-file="${build}/clamav/freshclam.conf" --datadir="${cache}/clamav-data/" --log=/dev/stdout --quiet
+freshclam --config-file="${build}/config/clamav/freshclam.conf" --datadir="${cache}/clamav-data/" --log=/dev/stdout
+
+# Replace the current virus database with the new one:
 rm -rf "${build}/.clamav-data"
 cp -rp "${cache}/clamav-data" "${build}/.clamav-data"
